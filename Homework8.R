@@ -1,12 +1,13 @@
 ##########################
 ####### Homework 8 #######
 ##########################
-# Group members: Keeley Kuru,
+# Group members: Keeley Kuru, Kristine Schoenecker
 # Date: 10/23/25
 
 library(EDIutils)
 library(readr)
 library(ggplot2)
+library(tidyverse)
 
 # Get the newest revision number for the data package
 scope <- "knb-lter-ntl"
@@ -65,6 +66,7 @@ ggplot(data %>% filter(!is.na(cond)),
   theme_minimal() +
   theme(legend.position = "none")
 
+
 # 2. Calcium concentrations over time for all lakes
 ggplot(data %>% filter(!is.na(ca)), 
        aes(x = sampledate, y = ca, color = lakeid)) +
@@ -76,19 +78,8 @@ ggplot(data %>% filter(!is.na(ca)),
        color = "Lake ID") +
   theme_minimal()
 
-# 3. Depth profile of conductivity for Trout Bog and year
-data %>%
-  filter(lakeid == "TB", year4 == 2022, !is.na(cond)) %>%
-  ggplot(aes(x = cond, y = depth)) +
-  geom_point() +
-  geom_path() +
-  scale_y_reverse() +
-  labs(title = "Trout Bog Conductivity Depth Profile (2022)",
-       x = "Conductivity (µS/cm)",
-       y = "Depth (m)") +
-  theme_minimal()
 
-# 4. Compare major ions for a specific lake
+# 4. Compare major ions for Trout Bog over years
 data %>%
   filter(lakeid == "TB", year4 >= 2020) %>%
   select(sampledate, ca, mg, na, k) %>%
