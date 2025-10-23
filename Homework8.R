@@ -52,8 +52,8 @@ unique(data$lakeid)
 # Check date range
 range(data$sampledate, na.rm = TRUE)
 
-# ======= Objective 2 ======= #
-# Example plots
+# ======= Objective 2 (parts A and B) ======= #
+# Example plots #
 
 # Filter data for Trout Bog only
 tb_data <- data %>% filter(lakeid == "TB")
@@ -77,6 +77,12 @@ TB_major_ions_comparison <- tb_data %>%
 
 TB_major_ions_comparison
 
+# Plot 1 annotation: 
+# The major cations in Trout Bog Lake show temporal patterns, 
+# with calcium generally exhibiting higher concentrations compared to magnesium, sodium, and potassium.
+# Over time, calcium levels appear to fluctuate more significantly.
+
+
 # Filter specifically for calcium in TB
 tb_ca <- data %>% 
   filter(lakeid == "TB", !is.na(ca))
@@ -92,6 +98,12 @@ TB_calcium_data_over_years <- ggplot(tb_ca, aes(x = sampledate, y = ca)) +
 
 TB_calcium_data_over_years
 
+# Plot 2 annotation: 
+# The calcium concentration in Trout Bog Lake shows variability over time,
+# with periods of increasing and decreasing concentrations of calcium (mg/L).
+# There are outliers that suggest occasional spikes or decreases in calcium levels.
+
+
 # 3. Trout Bog Calcium Concentration Over Time Colored by Depth
 TB_calcium_data_over_years_by_depth <- ggplot(tb_ca, aes(x = sampledate, y = ca, color = depth)) +
   geom_point(alpha = 0.6) +
@@ -104,5 +116,20 @@ TB_calcium_data_over_years_by_depth <- ggplot(tb_ca, aes(x = sampledate, y = ca,
 
 TB_calcium_data_over_years_by_depth
 
+# Plot 3 annotation: 
+# Calcium concentrations in Trout Bog Lake vary with depth over time.
+# Generally, lower depths tend to have higher calcium concentrations.
 
+# ===== Data quality check ===== #
+
+# Check temporal coverage of the data
+cat("Date range:", min(tb_data$sampledate, na.rm = TRUE), "to", 
+    max(tb_data$sampledate, na.rm = TRUE), "\n")
+cat("Total years of data:", length(unique(tb_data$year4)), "\n")
+cat("Total observations:", nrow(tb_data), "\n\n")
+
+# Check calcium data availability in Trout Bog
+tb_ca <- tb_data %>% filter(!is.na(ca))
+cat("Total calcium measurements:", nrow(tb_ca), "\n")
+cat("Calcium date range:", min(tb_ca$sampledate), "to", max(tb_ca$sampledate), "\n\n")
 
