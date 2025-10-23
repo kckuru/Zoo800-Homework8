@@ -4,6 +4,9 @@
 # Group members: Keeley Kuru, Kristine Schoenecker
 # Date: 10/23/25
 
+# ===== Objective 1 ===== #
+
+# Load necessary libraries
 library(EDIutils)
 library(readr)
 library(ggplot2)
@@ -46,52 +49,60 @@ summary(data)
 # See which lakes are in the dataset
 unique(data$lakeid)
 
-# Count observations per lake
-table(data$lakeid)
-
 # Check date range
 range(data$sampledate, na.rm = TRUE)
 
-# ==============
+# ======= Objective 2 ======= #
 # Example plots
-# ==============
 
-# 1. Box plot of conductivity by lake
-ggplot(data %>% filter(!is.na(cond)), 
-       aes(x = lakeid, y = cond, fill = lakeid)) +
-  geom_boxplot() +
-  labs(title = "Conductivity by Lake",
-       x = "Lake ID",
-       y = "Conductivity (µS/cm)") +
-  theme_minimal() +
-  theme(legend.position = "none")
+# Filter data for Trout Bog only
+tb_data <- data %>% filter(lakeid == "TB")
 
-
-# 2. Calcium concentrations over time for all lakes
-ggplot(data %>% filter(!is.na(ca)), 
-       aes(x = sampledate, y = ca, color = lakeid)) +
-  geom_point(alpha = 0.5) +
-  geom_smooth(se = FALSE) +
-  labs(title = "Calcium Concentrations Over Time",
-       x = "Date",
-       y = "Calcium (mg/L)",
-       color = "Lake ID") +
-  theme_minimal()
-
-
-# 4. Compare major ions for Trout Bog over years
-data %>%
-  filter(lakeid == "TB", year4 >= 2020) %>%
-  select(sampledate, ca, mg, na, k) %>%
+# 1. Major cations comparison in Trout Bog Lake (Ca, Mg, Na, K)
+TB_major_ions_comparison <- tb_data %>%
+  filter(!is.na(ca) | !is.na(mg) | !is.na(na) | !is.na(k)) %>%
+  select(sampledate, year4, depth, ca, mg, na, k) %>%
   pivot_longer(cols = c(ca, mg, na, k), 
                names_to = "ion", 
                values_to = "concentration") %>%
   filter(!is.na(concentration)) %>%
   ggplot(aes(x = sampledate, y = concentration, color = ion)) +
-  geom_line() +
-  geom_point() +
-  labs(title = "Major Ion Concentrations - Trout Bog (2020+)",
+  geom_point(alpha = 0.5) +
+  geom_smooth(se = FALSE) +
+  labs(title = "Trout Bog: Major Cation Concentrations",
        x = "Date",
-       y = "Concentration (mg/L)",
+       y = "Ion Concentration (mg/L)",
        color = "Ion") +
   theme_minimal()
+
+TB_major_ions_comparison
+
+# Filter specifically for calcium in TB
+tb_ca <- data %>% 
+  filter(lakeid == "TB", !is.na(ca))
+
+# 2.Trout Bog Calcium Concentration Over Time
+TB_calcium_data_over_years <- ggplot(tb_ca, aes(x = sampledate, y = ca)) +
+  geom_point(alpha = 0.6, color = "darkblue") +
+  geom_smooth(method = "loess", se = TRUE, color = "blue4") +
+  labs(title = "Trout Bog: Calcium Concentration Over Time",
+       x = "Date",
+       y = "Calcium (mg/L)") +
+  theme_minimal()
+
+TB_calcium_data_over_years
+
+# 3. Trout Bog Calcium Concentration Over Time Colored by Depth
+TB_calcium_data_over_years_by_depth <- ggplot(tb_ca, aes(x = sampledate, y = ca, color = depth)) +
+  geom_point(alpha = 0.6) +
+  scale_color_viridis_c(direction = -1) +
+  labs(title = "Trout Bog: Calcium Over Time (Colored by Depth)",
+       x = "Date",
+       y = "Calcium (mg/L)",
+       color = "Depth (m)") +
+  theme_minimal()
+
+TB_calcium_data_over_years_by_depth
+
+
+
